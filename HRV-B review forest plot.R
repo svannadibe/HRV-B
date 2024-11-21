@@ -7,7 +7,7 @@
   library(forestplot)
   library(dplyr)
 
-  data <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRVB Meta Analysis Data/HRVB Review Meta Analysis - Study Standard Diff.csv")
+  data <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRVB Review Meta Analysis - Study Standard Diff.csv")
 
   dat1 <- escalc(measure="SMD", m1i=data$m1i, sd1i=data$sd1i, n1i=data$n1i,
                  m2i=data$m2i, sd2i=data$sd2i, n2i=data$n2i, data=data)
@@ -184,11 +184,25 @@ for (n in outcomes) {
   low_CI <- (n$yi - (n$vi*2))
   upper_CI <- (n$yi + (n$vi*2))
   
+  m <- mean(n$yi)
+  m_sd <- mean(n$vi)
+  m_lower <- (m - 2*m_sd)
+  m_upper <- (m + 2*m_sd)
+  
+  smd <- append(smd, m, after = length(smd))
+  low_CI <- append(low_CI, m_lower, length(low_CI))
+  upper_CI <- append(upper_CI, m_upper, length(upper_CI))
+  
   label <- list(authors, smd)
+  
+
   
   #plot_name <- c("Forest Plot", n)
   
   col_vec <- c()
+  pop <- c()
+  count <- 0
+  
   for (i in n$Control.1) {
     
     cont <- c("TAU/WL"= 1, "J" = 2, "PE"  = 3  , "MM" = 4  ,  "PA"  = 5, "RM" = 6, "Sham" = 7, "PMR" = 8)
@@ -199,20 +213,36 @@ for (n in outcomes) {
     
     col_vec <- append(col_vec, add, after = length(col_vec)) 
     
+    count <- count + 1
+    
+    num <- (n$n1i[count] + n$n2i[count])/150
+    
+    if (num > 1) {
+      num <- 0.75
+    }
+    
+    pop <- append(pop, num, after = length(pop))
+    
   }
   
-  print(n$Control.1)
-  print(length(n$Control.1))
+  
+  # print(n$Control.1)
+  # print(length(n$Control.1))
   
   labels <- prepLabelText(labeltext = n$Control.1,
-                          nr = length(n$Control.1))
+                          nr = length(n$Control.1))  
+
+  
+  #labels[[1]] <- append(labels[[1]], "summary", after = length(labels[[1]]))
+  
+  
   graph.pos <- "left"
   graph.pos <- prepGraphPositions(graph.pos, nc = attr(labels, "no_cols"))
   align <- c()
   align <- prepAlign(align, graph.pos, nc = attr(labels, "no_cols"))
   
   
-  forest <- forestplot(mean = n$yi, lower = low_CI, upper = upper_CI, labeltext = label, boxsize = 0.5, lineheight = "lines", title = n$Outcome) |>
+  forest <- forestplot(mean = n$yi, lower = low_CI, upper = upper_CI, labeltext = label, boxsize = pop, lineheight = "lines", title = n$Outcome) |>
     fp_set_style(box = col_vec)
   
   print(forest)
