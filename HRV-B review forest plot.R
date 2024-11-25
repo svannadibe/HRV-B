@@ -6,15 +6,32 @@ library(dplyr)
 
 #data <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRVB Review Meta Analysis - Study Standard Diff.csv")
 
-#data <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRVB Review Meta Analysis - Study Standard Diff TAU.csv")
+data <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRVB Review Meta Analysis - Study Standard Diff TAU.csv")
 
-data <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRVB Review Meta Analysis - Study Standard Diff TAU.csv")
+#data <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRVB Review Meta Analysis - Study Standard Diff TAU.csv")
 
-practice <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRV-B Review Data Extraction - Practice Time TAU.csv")
+#practice <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRV-B Review Data Extraction - Practice Time TAU.csv")
+
+practice <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRV-B Review Data Extraction - Practice Time TAU.csv")
 
 dat1 <- escalc(measure="SMD", m1i=data$m1i, sd1i=data$sd1i, n1i=data$n1i,
                m2i=data$m2i, sd2i=data$sd2i, n2i=data$n2i, data=data)
 
+outcome_names <- list("PTSD","Depression","Substance Abuse", "Mindfulness","Sleep", "Anxiety" , "Quality of Life", "Stress")
+outcomes <- list(PTSD,Depression,Substance_Abuse, Mindfulness,Sleep, Anxiety , Quality_of_Life, Stress)
+
+c <- 0
+
+# for (n in outcome_names) {
+#   
+#   c <- c + 1
+#   
+#   outcome_data <- as.character(outcome[c])
+#   
+#   outcome_data <- dat1[dat1$Outcome == n,]
+#   outcomes$Tot_Practice <- practice$Total.Practice.Time[practice$Outcome == n]
+#   
+# }
 
 PTSD <- dat1[dat1$Outcome == "PTSD",]
 PTSD$Tot_Practice <- practice$Total.Practice.Time[practice$Outcome == "PTSD"]
@@ -76,14 +93,7 @@ for (k in Mindfulness$yi) {
 # TAU_yi_tot
 
 
-
-
-
-
-outcomes <- list(PTSD,Depression,Substance_Abuse,Mindfulness,Sleep,Anxiety,Quality_of_Life,Stress)
-
-
-
+c <- 0
 
 for (n in outcomes) {
   
@@ -96,18 +106,23 @@ for (n in outcomes) {
   Exp_n <- n$n1i
   Cont_n <- n$n2i
   left_col <- data.frame(Exp_n, Cont_n)
-  
   tot_practice <- TAU_data$Tot_Practice
-  
-
+  c1 <- c + 1
  
-  if (length(TAU_yi) >= 3) {
+  if (length(TAU_yi) > 2) {
     
     random_effects <- rma(TAU_yi, TAU_vi, data = TAU_data, method = "REML")
+    
     print(TAU_Outcome[1])
     
-    print("Random Effects")
+    if (length(TAU_data$Diagnosis[TAU_data$Diagnosis == outcome_names[c1]]) > 1) {
+      
+      update(random_effects, subset = (TAU_data$Diagnosis == outcome_names[c1]))
+      
+    }
     
+    print("Random Effects")
+    print(outcome_names[c1])
     print(random_effects)
     
     
