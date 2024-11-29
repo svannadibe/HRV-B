@@ -13,27 +13,21 @@ library(shiny)
 
 library(plyr)
 
-
-#Mac
-#data <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRVB Review Meta Analysis - Study Standard Diff TAU.csv")
+#Windows
+data <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRV-B Review Data Extraction - Study Standard Diff All Outcomes.csv")
 
 #Windows
-#data <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRV-B Review Data Extraction - Study Standard Diff All Outcomes.csv")
+practice <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRV-B Review Data Extraction - VariablesTAU.csv")
 
 #Windows
-#practice <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRV-B Review Data Extraction - VariablesTAU.csv")
+HRV_data <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRVB Review Meta Analysis - HRV Data.csv")
 
 #Mac
-#practice <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRV-B Review Data Extraction - Practice Time TAU.csv")
+#practice <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRV-B Review Data Extraction - VariablesTAU.csv")
 
-#Desktop
-#HRV_data <- read.csv("C:/Users/svannadibe/Desktop/HRV Biofeedback/HRV-B meta-analysis/HRVB Review Meta Analysis - HRV Data.csv")
+#HRV_data <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRVB Review Meta Analysis - HRV Data.csv")
 
-practice <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRV-B Review Data Extraction - VariablesTAU.csv")
-
-HRV_data <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRVB Review Meta Analysis - HRV Data.csv")
-
-HRV_var <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRVB Review Meta Analysis - HRV Variables.csv")
+#HRV_var <- read.csv("~/Desktop/Dr Sherry Chan Lab/HRV-B review/HRV-B/HRVB Review Meta Analysis - HRV Variables.csv")
 
 
 ################################################################################
@@ -162,14 +156,15 @@ for (n in outcomes) {
     
     #check levels of grouping factor are less than number of observations
     
+    #https://stackoverflow.com/questions/40027690/finding-model-predictor-values-that-maximize-the-outcome
+    
     if (length(unique(duration)) < length(TAU_study) | length(unique(tot_practice)) < length(TAU_study)) {
       
       print(length(unique(duration)))
       print(length(TAU_study))
       
       #maximize function to find optimum study duration
-      MR_factor <- lmer(formula = TAU_yi ~ o1 + duration + (1 | TAU_study), data = TAU_data)
-      
+      MR_factor <- lmer(formula = TAU_yi ~ 1 + duration + (1 | TAU_study), data = TAU_data)
       
       predval <- function(x) {
         newdata <- data.frame(duration = x[1], tot_practice = x[2], visits = x[3], 
